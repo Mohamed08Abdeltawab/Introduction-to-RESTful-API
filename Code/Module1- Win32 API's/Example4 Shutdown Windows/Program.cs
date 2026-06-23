@@ -6,24 +6,26 @@ using System.CodeDom;
 
 namespace Example4_Shutdown_Windows
 {
-    internal class Program
+
+    class Program
     {
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool ExitWindowsEx(uint uFlags, uint dwReason);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool ExitWindowsEx(uint uFlags, uint dwReason);
+
         [DllImport("advapi32.dll", SetLastError = true)]
-        static extern bool OpenProcessToken(IntPtr ProcessHandel, uint DesiredAccess, out IntPtr TokenHandel);
+        public static extern bool OpenProcessToken(IntPtr ProcessHandle, uint DesiredAccess, out IntPtr TokenHandle);
+
         [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern bool LookupPrivilegeValue(string lpSystemName, string lpName, out LUID lpLuid);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         public static extern bool AdjustTokenPrivileges(IntPtr TokenHandle, bool DisableAllPrivileges, ref TOKEN_PRIVILEGES NewState, int BufferLength, IntPtr PreviousState, IntPtr ReturnLength);
 
-
-        [StructLayout(LayoutKind.Sequential,  Pack = 1)]]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         internal struct LUID
         {
             public uint LowPart;
-            public uint HighPart;
+            public int HighPart;
         }
 
         internal struct TOKEN_PRIVILEGES
@@ -41,7 +43,7 @@ namespace Example4_Shutdown_Windows
         const uint EWX_REBOOT = 0x00000002;
         const uint EWX_FORCE = 0x00000004;
 
-        static void Main(string[] args)
+        static void Main()
         {
             EnableShutdownPrivilege();
             // Shutdown the system
@@ -78,6 +80,6 @@ namespace Example4_Shutdown_Windows
                 return;
             }
         }
-
     }
+
 }
